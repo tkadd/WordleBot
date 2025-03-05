@@ -1,67 +1,89 @@
+import numpy as np
+
 class WordleBot:
 
     def __init__(self):
-        self.dictionary = []
-        with open('wordle_dictionary.txt', "r") as words:
+        self.dictionary = set()
+        with open('./wordle_dictionary.txt', "r") as words:
             for line in words:
-                self.dictionary.append(line[:5])
-
+                self.dictionary.add(line[:5])
         self.attempts = []
         self.results = []
     
-    def attempt(self, attempt, result):
+    def play(self, attempt, result, update_dictionary=True, display=True, dictionary=None):
+        if dictionary is None:
+            dictionary = self.dictionary
         self.attempts.append(attempt)
         self.results.append(result)
-        count = {}
-        for i in range(5):
-            if attempt[i] not in count: count[attempt[i]] = 1
-            else: count[attempt[i]] += 1
-        seen = []
-        for i in range(5):
-            if result[i] == 'G':
-                letter = attempt[i]
-                ind = 0
-                n = len(self.dictionary)
-                while ind < n:
-                    if self.dictionary[ind][i] != letter:
-                        self.dictionary.pop(ind)
-                        n -= 1
-                    else: ind += 1
-            elif result[i] == '_':
-                letter = attempt[i]
-                ind = 0
-                n = len(self.dictionary)
-                if count[letter] == 1:
-                    while ind < n:
-                        if letter in self.dictionary[ind]:
-                            self.dictionary.pop(ind)
-                            n -= 1
-                        else: ind += 1
-                elif count[letter] == 2:
-                    if attempt[i] not in seen:
-                        while ind < n:
-                            if letter in self.dictionary[ind]:
-                                self.dictionary.pop(ind)
-                                n -= 1
-                            else: ind += 1
-                    else:
-                        if self.results[seen.index(letter)] == '_': pass
-                        elif self.results[seen.index(letter)] == 'G':
-                            pass
-                        else:
-                            pass
-            elif result[i] == 'Y':
-                letter = attempt[i]
-                ind = 0
-                n = len(self.dictionary)
-                while ind < n:
-                    if letter not in self.dictionary[ind] or letter == self.dictionary[ind][i]:
-                        self.dictionary.pop(ind)
-                        n -= 1
-                    else: ind += 1
-            seen.append(attempt[i])
-        print(f"{len(self.dictionary)} options remain")
 
+        new_dictionary = set()
+        for word in dictionary:
+            temp_result = self.result(attempt, word)
+            if temp_result == result: new_dictionary.add(word)
+
+        n = len(new_dictionary)
+        if update_dictionary:
+            self.dictionary = new_dictionary
+        if display:
+            print(f"{len(self.dictionary)} option{'s' if n > 1 else ''} remain{'' if n > 1 else 's'}")
+        return n, new_dictionary
     
-    def suggestion(self):
-        pass
+    def suggestion(self, dictionary=None):
+        if dictionary is None: dictionary = self.dictionary
+        word_entropy = {}
+        n = len(dictionary)
+        for guess in dictionary:
+            result_counts = {}
+            for target in dictionary:
+                res = self.result(guess, target)
+                if res in result_counts: result_counts[res] += 1
+                else: result_counts[res] = 1
+            entropy = -sum((count/n)*np.log2(count/n) for count in result_counts.values())
+            word_entropy[guess] = entropy
+        
+        best_guess = max(word_entropy, key=word_entropy.get)
+        return best_guess, word_entropy
+
+    def result(self, word, target):
+        result = ['0','0','0','0','0']
+        seen = {}
+        for i, letter in enumerate(word):
+            if letter == target[i]:
+                result[i] = 'G'
+                if letter not in seen: seen[letter] = 1
+                else: seen[letter] += 1
+        for i, letter in enumerate(word):
+            if result[i] != 'G':
+                target_count = target.count(letter)
+                if letter in seen:
+                    if seen[letter] < target_count:
+                        result[i] = 'Y'
+                    else:
+                        result[i] = 'B'
+                    seen[letter] += 1
+                else:
+                    if not target_count: result[i] = 'B'
+                    else: result[i] = 'Y'
+                    seen[letter] = 1
+
+        return "".join(result)
+
+    def performance(self):
+        scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+        for target in self.dictionary:
+            dictionary = self.dictionary.copy()
+            count = 1
+            best_guess = 'raise'
+            res = self.result(best_guess, target)
+            n, dictionary = self.attempt(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
+            while best_guess != target:
+                count += 1
+                best_guess = self.suggestion(dictionary)[0]
+                res = self.result(best_guess, target)
+                n, dictionary = self.attempt(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
+
+            scores[count] += 1
+        return scores
+
+if __name__ == '__main__':
+    pass
