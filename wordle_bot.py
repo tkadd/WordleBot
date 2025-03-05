@@ -75,12 +75,12 @@ class WordleBot:
             count = 1
             best_guess = 'raise'
             res = self.result(best_guess, target)
-            n, dictionary = self.attempt(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
+            n, dictionary = self.play(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
             while best_guess != target:
                 count += 1
                 best_guess = self.suggestion(dictionary)[0]
                 res = self.result(best_guess, target)
-                n, dictionary = self.attempt(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
+                n, dictionary = self.play(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
 
             scores[count] += 1
         return scores
