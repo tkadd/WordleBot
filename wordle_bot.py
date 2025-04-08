@@ -4,17 +4,13 @@ class WordleBot:
 
     def __init__(self):
         self.dictionary = set()
-        with open('./wordle_dictionary.txt', "r") as words:
+        with open('wordle/wordle_dictionary.txt', "r") as words:
             for line in words:
                 self.dictionary.add(line[:5])
-        self.attempts = []
-        self.results = []
     
     def play(self, attempt, result, update_dictionary=True, display=True, dictionary=None):
         if dictionary is None:
             dictionary = self.dictionary
-        self.attempts.append(attempt)
-        self.results.append(result)
 
         new_dictionary = set()
         for word in dictionary:
@@ -28,7 +24,7 @@ class WordleBot:
             print(f"{len(self.dictionary)} option{'s' if n > 1 else ''} remain{'' if n > 1 else 's'}")
         return n, new_dictionary
     
-    def suggestion(self, dictionary=None):
+    def word_entropy(self, dictionary=None):
         if dictionary is None: dictionary = self.dictionary
         word_entropy = {}
         n = len(dictionary)
@@ -42,7 +38,7 @@ class WordleBot:
             word_entropy[guess] = entropy
         
         best_guess = max(word_entropy, key=word_entropy.get)
-        return best_guess, word_entropy
+        return word_entropy
 
     def result(self, word, target):
         result = ['0','0','0','0','0']
@@ -67,9 +63,12 @@ class WordleBot:
                     seen[letter] = 1
 
         return "".join(result)
+    
+    def predict(self):
+        return None             
 
     def performance(self):
-        scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+        scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         for target in self.dictionary:
             dictionary = self.dictionary.copy()
             count = 1
@@ -82,7 +81,10 @@ class WordleBot:
                 res = self.result(best_guess, target)
                 n, dictionary = self.play(best_guess, res, update_dictionary=False, display=False, dictionary=dictionary)
 
-            scores[count] += 1
+            if count in scores:
+                scores[count] += 1
+            else:
+                scores[count] = 1
         return scores
 
 if __name__ == '__main__':
