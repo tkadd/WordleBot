@@ -4,7 +4,7 @@ class WordleBot:
 
     def __init__(self):
         self.dictionary = set()
-        with open('wordle/wordle_dictionary.txt', "r") as words:
+        with open('wordle/dictionaries/wordle_dictionary.txt', "r") as words:
             for line in words:
                 self.dictionary.add(line[:5])
     

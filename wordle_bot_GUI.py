@@ -7,12 +7,11 @@ class WordleGUI(ctk.CTk):
         super().__init__()
 
         self.title("Wordle Bot")
-        self.geometry("565x455")
         ctk.set_appearance_mode('light')
 
-        self.iconbitmap('wordle/wordlebot_icon.ico')
+        self.iconbitmap('wordle/assets/wordlebot_icon.ico')
 
-        self.resizable(True, True)
+        self.resizable(False, False)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -158,7 +157,7 @@ class Wordle(ctk.CTkFrame):
                                      width=60,
                                      corner_radius=0,
                                      fg_color='white',
-                                     border_color='#D3D6DA',
+                                     border_color="#D3D6DA",
                                      state='disabled')
                 entry._entry.configure(cursor="arrow")
                 entry.grid(row=0, column=j, padx=2, pady=2, sticky='nsew')
