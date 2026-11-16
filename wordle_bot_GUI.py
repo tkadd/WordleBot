@@ -9,8 +9,6 @@ class WordleGUI(ctk.CTk):
         self.title("Wordle Bot")
         ctk.set_appearance_mode('light')
 
-        self.iconbitmap('wordle/assets/wordlebot_icon.ico')
-
         self.resizable(False, False)
 
         self.grid_rowconfigure(0, weight=1)
@@ -29,6 +27,7 @@ class WordleGUI(ctk.CTk):
 class Wordle(ctk.CTkFrame):
 
     def __init__(self, parent, controller):
+        self.scale = 2.5
         super().__init__(parent, fg_color='transparent')
         self.controller = controller
 
@@ -58,8 +57,8 @@ class Wordle(ctk.CTkFrame):
         for i in range(4):
             colour_buttons_frame.columnconfigure(i, weight=1)
 
-        button_style1 = {'height': 40,
-                        'width': 40,
+        button_style1 = {'height': self.scale*40,
+                        'width': self.scale*40,
                         'text': '',
                         'corner_radius': 5}
 
@@ -85,10 +84,10 @@ class Wordle(ctk.CTkFrame):
         grey_button.grid(row=0, column=2, padx=3, pady=2)
 
         back_button = ctk.CTkButton(colour_buttons_frame,
-                                    font=('Arial', 15, 'bold'),
+                                    font=('Arial', self.scale*15, 'bold'),
                                     text="\u232B",
-                                    height=30,
-                                    width=40,
+                                    height=self.scale*30,
+                                    width=self.scale*40,
                                     corner_radius=5,
                                     fg_color='black',
                                     hover_color='#333333',
@@ -96,12 +95,12 @@ class Wordle(ctk.CTkFrame):
         back_button.grid(row=0, column=3, padx=3, pady=2)
 
         # Undo Button:
-        button_style2 = {'font': ('Cascadia Mono', 20, 'bold'),
+        button_style2 = {'font': ('Cascadia Mono', self.scale*20, 'bold'),
                          'text_color': 'white',
                          'corner_radius': 5,
                          'fg_color': 'black',
                          'hover_color': '#333333',
-                         'height': 30}
+                         'height': self.scale*30}
 
         undo_button = ctk.CTkButton(self,
                                     text='UNDO',
@@ -150,11 +149,11 @@ class Wordle(ctk.CTkFrame):
             word = []
             for j in range(5):
                 entry = ctk.CTkEntry(word_frame,
-                                     font=("Cascadia Mono", 40, 'bold'),
+                                     font=("Cascadia Mono", self.scale*40, 'bold'),
                                      text_color='black',
                                      justify="center",
-                                     height=60,
-                                     width=60,
+                                     height=self.scale*60,
+                                     width=self.scale*60,
                                      corner_radius=0,
                                      fg_color='white',
                                      border_color="#D3D6DA",
@@ -252,12 +251,12 @@ class Wordle(ctk.CTkFrame):
 
         for i in range(min(len(sorted_entropy), 10)):
             word_display = ctk.CTkLabel(self.word_frame,
-                                        font=('Cascadia Mono', 20),
+                                        font=('Cascadia Mono', self.scale*20),
                                         text=f'{sorted_entropy[i][0].upper()} - {sorted_entropy[i][1]:.3f}',
                                         justify='center')
             word_display.grid(row=i, padx=22, pady=3, sticky='nsew')
         length_display = ctk.CTkLabel(self.word_frame,
-                                      font=('Cascadia Mono', 20),
+                                      font=('Cascadia Mono', self.scale*20),
                                       text=f'{len(sorted_entropy)} options',
                                       justify='center')
         length_display.grid(row=10, padx=3, pady=3, sticky='nsew')
